@@ -1,4 +1,4 @@
-language: cpp
+language: R
 warnings_are_errors: true
 sudo: true
 cache: packages
