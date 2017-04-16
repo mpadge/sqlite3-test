@@ -1,0 +1,203 @@
+#' Store hire bicycle data in SQLite3 database
+#'
+#' @param city One or more cities for which to download and store bike data, or
+#'          names of corresponding bike systems (see Details below).
+#' @param data_dir A character vector giving the directory containing the
+#'          data files downloaded with \code{dl_bikedata} for one or more
+#'          cities. Only if this parameter is missing will data be downloaded.
+#' @param bikedb A string containing the path to the SQLite3 database to 
+#'          use. If it doesn't already exist, it will be created, otherwise data
+#'          will be appended to existing database.
+#' @param create_index If TRUE, creates an index on the start and end station
+#'          IDs and start and stop times.
+#'
+#' @return Number of trips added to database
+#'
+#' @section Details:
+#' City names are not case sensitive, and must only be long enough to
+#' unambiguously designate the desired city. Names of corresponding bike systems
+#' can also be given.  Currently possible cities (with minimal designations in
+#' parentheses) and names of bike hire systems are:
+#' \tabular{lr}{
+#'  New York City (ny)\tab Citibike\cr
+#'  Washington, D.C. (dc)\tab Capital Bike Share\cr
+#'  Chicago (ch)\tab Divvy Bikes\cr
+#'  Los Angeles (la)\tab Metro Bike Share\cr
+#'  Boston (bo)\tab Hubway\cr
+#' }
+#'
+#' @note Data for different cities are all stored in the same database, with
+#' city identifiers automatically established from the names of downloaded data
+#' files. This function can take quite a long time to execute (typically > 10
+#' minutes), and generates a SQLite3 database file several gigabytes in size.
+#' Downloaded data files are removed after loading into the database; files may
+#' be downloaded and stored permanently with \code{dl_bikedata}, and the
+#' corresponding \code{data_dir} passed to this function.
+#' 
+#' @export
+store_bikedata <- function (city = 'ch', data_dir = './tests', 
+                            bikedb, create_index = TRUE)
+{
+    er_idx <- file.exists (bikedb) + 1 # = (1, 2) if (!exists, exists)
+    message (c ('Creating', 'Adding data to') [er_idx], ' sqlite3 database')
+    if (!file.exists (bikedb))
+    {
+        chk <- rcpp_create_sqlite3_db (bikedb)
+        if (chk != 0)
+            stop ('Unable to create SQLite3 database')
+    }
+
+    ntrips <- 0
+    ci <- city
+    message ('Unzipping raw data files for ', ci, ' ...')
+    flists <- bike_unzip_files_chicago (data_dir, bikedb)
+
+    if (length (flists$flist_csv) > 0)
+    {
+        # Import file names to datafile table
+        #nf <- num_datafiles_in_db (bikedb)
+        nf <- 0
+        if (length (flists$flist_zip) > 0)
+            nf <- rcpp_import_to_file_table (bikedb, 
+                                             basename (flists$flist_zip),
+                                             ci, nf)
+        if (ci == 'lo' & length (flists$flist_csv) > 0)
+            nf <- rcpp_import_to_file_table (bikedb, 
+                                             basename (flists$flist_csv),
+                                             ci, nf)
+
+        # main step: Import trips
+        ntrips_city <- rcpp_import_to_trip_table (bikedb, flists$flist_csv,
+                                                  ci, FALSE)
+
+        # import stations to stations table - hard-coded for ch
+        ch_stns <- bike_get_chicago_stations (flists)
+        nstations <- rcpp_import_stn_df (bikedb, ch_stns, 'ch')
+
+        if (length (flists$flist_rm) > 0)
+            invisible (file.remove (flists$flist_rm))
+        ntrips <- ntrips + ntrips_city
+    }
+
+    if (ntrips > 0)
+    {
+        message ('Total trips ', c ('read', 'added') [er_idx], ' = ',
+                 format (ntrips, big.mark = ',', scientific = FALSE))
+    } else
+        message ('All data already in database; no new data added')
+
+    rcpp_create_city_index (bikedb, er_idx - 1)
+
+    if (ntrips > 0 & create_index) # additional indexes for stations and times
+    {
+        message (c ('Creating', 'Re-creating') [er_idx], ' indexes')
+        rcpp_create_db_indexes (bikedb,
+                           tables = rep("trips", times = 4),
+                           cols = c("start_station_id", "end_station_id",
+                                    "start_time", "stop_time"),
+                           indexes_exist (bikedb))
+    }
+
+    return (ntrips)
+}
+
+
+#' Get list of data files for a particular city in specified directory 
+#'
+#' @param data_dir Directory containing data files
+#' @param city One of (nyc, boston, chicago, dc, la)
+#'
+#' @return Only those members of flist corresponding to nominated city
+#'
+#' @noRd
+get_flist_city <- function (data_dir, city)
+{
+    city <- convert_city_names (city)
+
+    flist <- list.files (data_dir, pattern = '.zip')
+
+    index <- NULL
+    if (any (city == 'ny'))
+        index <- which (grepl ('citibike', flist, ignore.case = TRUE))
+    else if (any (city == 'ch'))
+        index <- which (grepl ('divvy', flist, ignore.case = TRUE))
+    else if (any (city == 'bo'))
+        index <- which (grepl ('hubway', flist, ignore.case = TRUE))
+    else if (any (city == 'dc'))
+        index <- which (grepl ('cabi', flist, ignore.case = TRUE))
+    else if (any (city == 'la'))
+        index <- which (grepl ('metro', flist, ignore.case = TRUE))
+    else if (any (city == 'lo'))
+        index <- which (grepl ('Journey', flist, ignore.case = TRUE) |
+                        grepl ('cyclehireusage', flist, ignore.case = TRUE))
+
+    ret <- NULL
+    if (length (index) > 0)
+        ret <- paste0 (data_dir, '/', flist [index])
+
+    return (ret)
+}
+
+#' Get list of Chicago files to be unzipped and added to database
+#'
+#' @param data_dir Directory containing data files
+#' @param bikedb A string containing the path to the SQLite3 database 
+#'
+#' @return List of three vectors of file names:
+#' \itemize{
+#' \item @code{flist_zip} contains names of all zip archives to be added to
+#' database;
+#' \item \code{flist_csv_trip} contains all corresponding \code{.csv} files of
+#' trip data;
+#' \item \code{flist_csv_stn} contains all corresponding \code{.csv} files of
+#' station data;
+#' \item \code{flist_rm} contains files to be deleted after having been added,
+#' }
+#'
+#' @note File 'Divvy_Stations_Trips_2014_Q1Q2.zip' has a 'Divvy_Stations' file
+#' in \code{.xlsx} format. The stations are identical to those from 2013, so
+#' this is *NOT* extracted here. That's the only archive with an \code{.xlxs}
+#' file.
+#'
+#' @noRd
+bike_unzip_files_chicago <- function (data_dir, bikedb)
+{
+    flist_zip <- get_flist_city (data_dir, city = 'ch')
+    #flist_zip <- get_new_datafiles (bikedb, flist_zip)
+    existing_csv_files <- list.files (data_dir, pattern = "Divvy.*\\.csv")
+    if (length (existing_csv_files) == 0)
+        existing_csv_files <- NULL
+    flist_csv_trips <- flist_csv_stns <- flist_rm <- NULL
+    if (length (flist_zip) > 0)
+    {
+        for (f in flist_zip)
+        {
+            fi <- unzip (f, list = TRUE)$Name
+            fi_trips <- fi [which (grepl ('Trips.*\\.csv', basename (fi)))]
+            fi_stns <- fi [which (grepl ('Stations', basename (fi)) &
+                                            grepl ('.csv', basename (fi)))]
+            flist_csv_trips <- c (flist_csv_trips, basename (fi_trips))
+            flist_csv_stns <- c (flist_csv_stns, basename (fi_stns))
+            if (!all (basename (fi_trips) %in% existing_csv_files))
+            {
+                unzip (f, files = fi_trips, exdir = data_dir, junkpaths = TRUE)
+                flist_rm <- c (flist_rm, basename (fi_trips))
+            }
+            if (length (fi_stns) > 0) # always except 2014_Q1Q2 with .xlsx
+                if (!all (basename (fi_stns) %in% existing_csv_files))
+                {
+                    unzip (f, files = fi_stns, exdir = data_dir, junkpaths = TRUE)
+                    flist_rm <- c (flist_rm, basename (fi_stns))
+                }
+        }
+        flist_csv_trips <- paste0 (data_dir, '/', flist_csv_trips)
+        flist_csv_stns <- paste0 (data_dir, '/', flist_csv_stns)
+        if (length (flist_rm) > 0)
+            flist_rm <- paste0 (data_dir, '/', flist_rm)
+    }
+    return (list (flist_zip = flist_zip,
+                  flist_csv = flist_csv_trips,
+                  flist_csv_stns = flist_csv_stns,
+                  flist_rm = flist_rm))
+}
+

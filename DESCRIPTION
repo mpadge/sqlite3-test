@@ -1,0 +1,28 @@
+Package: sqlite3test
+Title: Test C++ issue with bikedata package
+Version: 0.0.0
+Authors@R: c(
+    person("Mark", "Padgham", email="mark.padgham@email.com", role=c("aut", "cre")),
+    person("Richard", "Ellison", role="aut"))
+Description: Load data from public hire bicycle systems.
+Depends:
+    RSQLite
+Imports:
+    dplyr,
+    httr,
+    lubridate,
+    methods,
+    Rcpp,
+    reshape2,
+    xml2
+Suggests:
+    testthat
+LinkingTo: 
+    BH,
+    Rcpp
+License: GPL-3
+SystemRequirements: C++11
+NeedsCompilation: yes
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
