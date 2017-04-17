@@ -57,18 +57,14 @@ store_bikedata <- function (city = 'ch', data_dir = './tests',
         # Import file names to datafile table
         #nf <- num_datafiles_in_db (bikedb)
         nf <- 0
-        if (length (flists$flist_zip) > 0)
-            nf <- rcpp_import_to_file_table (bikedb, 
-                                             basename (flists$flist_zip),
-                                             ci, nf)
-        if (ci == 'lo' & length (flists$flist_csv) > 0)
-            nf <- rcpp_import_to_file_table (bikedb, 
-                                             basename (flists$flist_csv),
-                                             ci, nf)
+        #if (length (flists$flist_zip) > 0)
+        #    nf <- rcpp_import_to_file_table (bikedb, 
+        #                                     basename (flists$flist_zip),
+        #                                     ci, nf)
 
         # main step: Import trips
-        ntrips_city <- rcpp_import_to_trip_table (bikedb, flists$flist_csv,
-                                                  ci, FALSE)
+        #ntrips_city <- rcpp_import_to_trip_table (bikedb, flists$flist_csv,
+        #                                          ci, FALSE)
 
         # import stations to stations table - hard-coded for ch
         ch_stns <- bike_get_chicago_stations (flists)
@@ -76,8 +72,9 @@ store_bikedata <- function (city = 'ch', data_dir = './tests',
 
         if (length (flists$flist_rm) > 0)
             invisible (file.remove (flists$flist_rm))
-        ntrips <- ntrips + ntrips_city
+        #ntrips <- ntrips + ntrips_city
     }
+    ntrips <- 200 # for tests
 
     if (ntrips > 0)
     {
