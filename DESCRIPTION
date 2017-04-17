@@ -18,7 +18,6 @@ Imports:
 Suggests:
     testthat
 LinkingTo: 
-    BH,
     Rcpp
 License: GPL-3
 SystemRequirements: C++11

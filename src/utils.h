@@ -1,16 +1,6 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <sqlite3.h>
-
-#include <curl/curl.h>
-
-// [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
-
-#include <boost/algorithm/string/replace.hpp>
 
 
 //' compare_version_numbers
