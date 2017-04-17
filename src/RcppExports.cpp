@@ -29,29 +29,3 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_create_db_indexes
-int rcpp_create_db_indexes(const char* bikedb, Rcpp::CharacterVector tables, Rcpp::CharacterVector cols, bool reindex);
-RcppExport SEXP sqlite3test_rcpp_create_db_indexes(SEXP bikedbSEXP, SEXP tablesSEXP, SEXP colsSEXP, SEXP reindexSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const char* >::type bikedb(bikedbSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type tables(tablesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type cols(colsSEXP);
-    Rcpp::traits::input_parameter< bool >::type reindex(reindexSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_create_db_indexes(bikedb, tables, cols, reindex));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_create_city_index
-int rcpp_create_city_index(const char* bikedb, bool reindex);
-RcppExport SEXP sqlite3test_rcpp_create_city_index(SEXP bikedbSEXP, SEXP reindexSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const char* >::type bikedb(bikedbSEXP);
-    Rcpp::traits::input_parameter< bool >::type reindex(reindexSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_create_city_index(bikedb, reindex));
-    return rcpp_result_gen;
-END_RCPP
-}

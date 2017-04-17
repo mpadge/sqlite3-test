@@ -5,6 +5,8 @@
 #include <map>
 #include <sqlite3.h>
 
+#include <curl/curl.h>
+
 // [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
 

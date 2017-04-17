@@ -18,57 +18,8 @@
 
 #include "sqlite3db-utils.h"
 
-int import_to_station_table (sqlite3 * dbcon,
-    std::map <std::string, std::string> stationqry);
 int rcpp_import_stn_df (const char * bikedb, Rcpp::DataFrame stn_data,
         std::string city);
-
-
-//' import_to_station_table
-//'
-//' Inserts data into the table of stations in the database. Applies to those
-//' cities for which station data are included and read as part of the actual
-//' raw trips data: ny, boston, la.
-//'
-//' @param dbcon Active connection to sqlite3 database
-//' @param stationqry Station query constructed during reading of data with
-//'        rcpp_import_to_trip_table ()
-//'
-//' @return integer result code
-//'
-//' @noRd
-int import_to_station_table (sqlite3 * dbcon,
-    std::map <std::string, std::string> stationqry)
-{
-    char *zErrMsg = 0;
-    int rc;
-
-    int n = 0;
-
-    // http://stackoverflow.com/questions/19337029/insert-if-not-exists-statement-in-sqlite
-    std::string fullstationqry = "INSERT OR IGNORE INTO stations "
-        "(city, stn_id, name, latitude, longitude) VALUES ";
-    fullstationqry += stationqry.begin ()->second;
-    for (auto thisstation = std::next (stationqry.begin ());
-            thisstation != stationqry.end (); ++thisstation)
-    {
-        fullstationqry += ", " + thisstation->second;
-    }
-    fullstationqry += ";";
-
-    rc = sqlite3_exec(dbcon, fullstationqry.c_str(), NULL, 0, &zErrMsg);
-    if (rc != SQLITE_OK)
-        throw std::runtime_error ("Unable to insert stations into station table");
-
-    std::string qry = "SELECT AddGeometryColumn"
-                      "('stations', 'geom', 4326, 'POINT', 'XY');";
-    rc = sqlite3_exec(dbcon, qry.c_str (), NULL, 0, &zErrMsg);
-
-    qry = "UPDATE stations SET geom = MakePoint(longitude, latitude, 4326);";
-    rc = sqlite3_exec(dbcon, qry.c_str (), NULL, 0, &zErrMsg);
-
-    return rc;
-}
 
 
 //' rcpp_import_stn_df
