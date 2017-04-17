@@ -54,48 +54,17 @@ store_bikedata <- function (city = 'ch', data_dir = './tests',
 
     if (length (flists$flist_csv) > 0)
     {
-        # Import file names to datafile table
-        #nf <- num_datafiles_in_db (bikedb)
-        nf <- 0
-        #if (length (flists$flist_zip) > 0)
-        #    nf <- rcpp_import_to_file_table (bikedb, 
-        #                                     basename (flists$flist_zip),
-        #                                     ci, nf)
-
-        # main step: Import trips
-        #ntrips_city <- rcpp_import_to_trip_table (bikedb, flists$flist_csv,
-        #                                          ci, FALSE)
-
         # import stations to stations table - hard-coded for ch
         ch_stns <- bike_get_chicago_stations (flists)
         nstations <- rcpp_import_stn_df (bikedb, ch_stns, 'ch')
 
         if (length (flists$flist_rm) > 0)
             invisible (file.remove (flists$flist_rm))
-        #ntrips <- ntrips + ntrips_city
     }
-    ntrips <- 200 # for tests
-
-    if (ntrips > 0)
-    {
-        message ('Total trips ', c ('read', 'added') [er_idx], ' = ',
-                 format (ntrips, big.mark = ',', scientific = FALSE))
-    } else
-        message ('All data already in database; no new data added')
 
     rcpp_create_city_index (bikedb, er_idx - 1)
 
-    if (ntrips > 0 & create_index) # additional indexes for stations and times
-    {
-        message (c ('Creating', 'Re-creating') [er_idx], ' indexes')
-        rcpp_create_db_indexes (bikedb,
-                           tables = rep("trips", times = 4),
-                           cols = c("start_station_id", "end_station_id",
-                                    "start_time", "stop_time"),
-                           indexes_exist (bikedb))
-    }
-
-    return (ntrips)
+    return (200) # for tests
 }
 
 
@@ -109,7 +78,7 @@ store_bikedata <- function (city = 'ch', data_dir = './tests',
 #' @noRd
 get_flist_city <- function (data_dir, city)
 {
-    city <- convert_city_names (city)
+    #city <- convert_city_names (city)
 
     flist <- list.files (data_dir, pattern = '.zip')
 
@@ -160,7 +129,6 @@ get_flist_city <- function (data_dir, city)
 bike_unzip_files_chicago <- function (data_dir, bikedb)
 {
     flist_zip <- get_flist_city (data_dir, city = 'ch')
-    #flist_zip <- get_new_datafiles (bikedb, flist_zip)
     existing_csv_files <- list.files (data_dir, pattern = "Divvy.*\\.csv")
     if (length (existing_csv_files) == 0)
         existing_csv_files <- NULL
