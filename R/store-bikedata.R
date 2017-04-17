@@ -8,8 +8,6 @@
 #' @param bikedb A string containing the path to the SQLite3 database to 
 #'          use. If it doesn't already exist, it will be created, otherwise data
 #'          will be appended to existing database.
-#' @param create_index If TRUE, creates an index on the start and end station
-#'          IDs and start and stop times.
 #'
 #' @return Number of trips added to database
 #'
@@ -36,7 +34,7 @@
 #' 
 #' @export
 store_bikedata <- function (city = 'ch', data_dir = './tests', 
-                            bikedb, create_index = TRUE)
+                            bikedb)
 {
     er_idx <- file.exists (bikedb) + 1 # = (1, 2) if (!exists, exists)
     message (c ('Creating', 'Adding data to') [er_idx], ' sqlite3 database')
@@ -61,8 +59,6 @@ store_bikedata <- function (city = 'ch', data_dir = './tests',
         if (length (flists$flist_rm) > 0)
             invisible (file.remove (flists$flist_rm))
     }
-
-    rcpp_create_city_index (bikedb, er_idx - 1)
 
     return (200) # for tests
 }

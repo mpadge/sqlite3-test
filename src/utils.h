@@ -10,53 +10,6 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
-//' strtokm
-//'
-//' A string delimiter function based on strtok
-//' Accessed from StackOverflow (using M Oehm):
-//' http://stackoverflow.com/questions/29847915/implementing-strtok-whose-delimiter-has-more-than-one-character
-//'
-//' @noRd
-char *strtokm(char *str, const char *delim)
-{
-    static char *tok;
-    static char *next;
-    char *m;
-
-    if (delim == NULL) return NULL;
-
-    tok = (str) ? str : next;
-    if (tok == NULL) return NULL;
-
-    m = strstr(tok, delim);
-
-    if (m) {
-        next = m + strlen(delim);
-        *m = '\0';
-    } else {
-        next = NULL;
-    }
-
-    return tok;
-}
-
-//' str_token
-//'
-//' A delimiter function for comma-separated std::string
-//'
-//' @param line The line of text to be tokenised
-//' @param delim The desired delimiter
-//'
-//' @return Next token
-//'
-//' @noRd
-std::string str_token (std::string * line, const char * delim)
-{
-    unsigned ipos = line->find (delim, 0);
-    std::string res = line->substr (0, ipos);
-    (*line) = line->substr (ipos + 1, line->length () - ipos - 1);
-    return res;
-}
 
 //' compare_version_numbers
 //'
@@ -125,80 +78,6 @@ int compare_version_numbers (std::string vstro, std::string compvstro) {
   
   return versiondiff;
 
-}
-
-//' rm_dos_end
-//'
-//' Remove dos line ending from a character string
-//'
-//' @noRd
-void rm_dos_end (char *str)
-{
-    char *p = strrchr (str, '\r');
-    if (p && p[1]=='\n' && p[2]=='\0') 
-        p[0] = '\0';
-}
-
-//' line_has_quotes
-//'
-//' Determine whether or not fields within a line are separated by double quotes
-//' and a comma, or just comma separated.
-//'
-//' @param line Character string with or without double-quote-comma separation
-//'
-//' @return true if line is delimited by double quotes and commas, false if
-//' commas only.
-//'
-//' @noRd
-bool line_has_quotes (char * line)
-{
-    bool has_quotes = false;
-    unsigned slen = strlen (line);
-    char * b;
-    b = (char*) line;
-    char ch;
-    for (unsigned i = 0; i<slen; ++i)
-    {
-        strncpy (&ch, b+i, 1);
-        if (ch == '\"')
-        {
-            has_quotes = true;
-            break;
-        }
-    }
-    return has_quotes;
-}
-
-//' convert_datetime
-//'
-//' Datetime strings for NYC change between 08/2014 and 09/2014 from
-//' yyyy-mm-dd HH:MM:SS to m/d/yyyy HH:MM:SS. sqlite3 can't combine dates in
-//' different formats, so this converts the latter to former formats.
-//'
-//' @noRd
-std::string convert_datetime (std::string str)
-{
-    // NOTE that the following does not work for some reason?
-    //if (size_t ipos = str.find ("/") != std::string::npos)
-    if (str.find ("/") != std::string::npos)
-    {
-        size_t ipos = str.find ("/");
-        std::string mm = str.substr (0, ipos);
-        if (ipos == 1)
-            mm = std::string ("0") + mm;
-        str = str.substr (ipos + 1, str.length () - ipos - 1);
-        ipos = str.find ("/");
-        std::string dd = str.substr (0, ipos);
-        if (ipos == 1)
-            dd = std::string ("0") + dd;
-        str = str.substr (ipos + 1, str.length () - ipos - 1);
-        ipos = str.find (" ");
-        std::string yy = str.substr (0, ipos);
-        str = str.substr (ipos + 1, str.length () - ipos - 1);
-        str = yy + "-" + mm + "-" + dd + " " + str;
-    }
-
-    return str;
 }
 
 // write result of curl call to std::string

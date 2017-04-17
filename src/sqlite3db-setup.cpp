@@ -21,7 +21,10 @@
 // [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
 #include "utils.h"
-#include "sqlite3db-add-data.h"
+
+// from sqlite3db-add-data.h
+#include "read-station-files.h"
+#include "sqlite3db-utils.h"
 
 
 //' rcpp_create_sqlite3_db

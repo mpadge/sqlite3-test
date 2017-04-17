@@ -16,70 +16,6 @@
 #' @noRd
 NULL
 
-#' import_boston_stations
-#'
-#' The Boston Hubway system has a separate \code{.csv} table with station data.
-#' This function reads the contents of that file into a std::string object used
-#' to construct the SQL query that inserts those data into the ' sqlite3
-#' database.
-#'
-#' @param stationqry Station query constructed during reading of data 
-#'
-#' @return Number of stations in the Hubway system
-#'
-#' @note This station table is actually useless, because the station ID values
-#' given do not match those used in the raw data files! The latter are simple
-#' integer codes, while IDs in the "official" \code{.csv} file are like
-#' "A32000" - all beginning with an alpha and then five digits. These codes
-#' do not appear anywhere in the trip data files, and so this whole function is
-#' not used. It is nevertheless kept for the plausible day when the Hubway folk
-#' fix up this inconsistency.
-#'
-#' @noRd
-NULL
-
-#' import_dc_stations
-#'
-#' The Washington DC CapitalBikeShare system does not actually have any station
-#' coordinates. These are instead provided by the DC government.  This
-#' function reads the contents of the "Captial Bike Share Locations" file into a
-#' std::string object used to construct the SQL query that inserts those data
-#' into the 'sqlite3' database.
-#'
-#' @return std::string to be passed directly as SQLite3 query
-#'
-#' @noRd
-NULL
-
-#' get_dc_stn_table
-#'
-#' Because some data files for Washington DC contain only the names of stations
-#' and not their ID numbers, a std::map is generated here mapping those names
-#' onto IDs for easy insertion into the trips data table.
-#'
-#' @param dbcon Active connection to SQLite3 database
-#'
-#' @return std::map of <station name, station ID>
-#'
-#' @note The map is tiny, so it's okay to return values rather than refs
-#'
-#' @noRd
-NULL
-
-#' get_dc_stn_ids
-#'
-#' Returns vector of all station IDs in the official DC Govt file. Only
-#' trips from and to stations with codes in this file are loaded into db.
-#'
-#' @param dbcon Active connection to SQLite3 database
-#'
-#' @return std::unordered_set of <std::string station ID>
-#'
-#' @note The map is tiny, so it's okay to return values rather than refs
-#'
-#' @noRd
-NULL
-
 #' rcpp_import_stn_df
 #'
 #' Import a data.frame of station (id, name, lon, lat) into the SQLite3
@@ -95,42 +31,6 @@ NULL
 #' @noRd
 rcpp_import_stn_df <- function(bikedb, stn_data, city) {
     .Call('sqlite3test_rcpp_import_stn_df', PACKAGE = 'sqlite3test', bikedb, stn_data, city)
-}
-
-#' rcpp_import_to_trip_table
-#'
-#' Extracts bike data for NYC citibike
-#' 
-#' @param bikedb A string containing the path to the Sqlite3 database to 
-#'        use. It will be created automatically.
-#' @param datafiles A character vector containin the paths to the citibike 
-#'        .csv files to import.
-#' @param city First two letters of city for which data are to be added (thus
-#'        far, "ny", "bo", "ch", "dc", and "la")
-#' @param quiet If FALSE, progress is displayed on screen
-#'
-#' @return integer result code
-#'
-#' @noRd
-rcpp_import_to_trip_table <- function(bikedb, datafiles, city, quiet) {
-    .Call('sqlite3test_rcpp_import_to_trip_table', PACKAGE = 'sqlite3test', bikedb, datafiles, city, quiet)
-}
-
-#' rcpp_import_to_file_table
-#'
-#' Creates and/or updates the table of datafile names in the database
-#' 
-#' @param bikedb A string containing the path to the Sqlite3 database to 
-#'        use. 
-#' @param datafiles List of names of files to be added - must be names of
-#'        compressed \code{.zip} archives, not expanded \code{.csv} files
-#' @param city Name of city associated with datafile
-#'
-#' @return Number of datafile names added to database table
-#'
-#' @noRd
-rcpp_import_to_file_table <- function(bikedb, datafiles, city, nfiles) {
-    .Call('sqlite3test_rcpp_import_to_file_table', PACKAGE = 'sqlite3test', bikedb, datafiles, city, nfiles)
 }
 
 #' rcpp_create_sqlite3_db
@@ -182,27 +82,6 @@ rcpp_create_city_index <- function(bikedb, reindex) {
     .Call('sqlite3test_rcpp_create_city_index', PACKAGE = 'sqlite3test', bikedb, reindex)
 }
 
-#' strtokm
-#'
-#' A string delimiter function based on strtok
-#' Accessed from StackOverflow (using M Oehm):
-#' http://stackoverflow.com/questions/29847915/implementing-strtok-whose-delimiter-has-more-than-one-character
-#'
-#' @noRd
-NULL
-
-#' str_token
-#'
-#' A delimiter function for comma-separated std::string
-#'
-#' @param line The line of text to be tokenised
-#' @param delim The desired delimiter
-#'
-#' @return Next token
-#'
-#' @noRd
-NULL
-
 #' compare_version_numbers
 #'
 #' Function to compare version numbers
@@ -211,35 +90,6 @@ NULL
 #' -1 = Argument one version lower than Argument two version
 #' 0 = Argument one version equal to Argument two version
 #' 1 = Argument one version higher than Argument two version
-#'
-#' @noRd
-NULL
-
-#' rm_dos_end
-#'
-#' Remove dos line ending from a character string
-#'
-#' @noRd
-NULL
-
-#' line_has_quotes
-#'
-#' Determine whether or not fields within a line are separated by double quotes
-#' and a comma, or just comma separated.
-#'
-#' @param line Character string with or without double-quote-comma separation
-#'
-#' @return true if line is delimited by double quotes and commas, false if
-#' commas only.
-#'
-#' @noRd
-NULL
-
-#' convert_datetime
-#'
-#' Datetime strings for NYC change between 08/2014 and 09/2014 from
-#' yyyy-mm-dd HH:MM:SS to m/d/yyyy HH:MM:SS. sqlite3 can't combine dates in
-#' different formats, so this converts the latter to former formats.
 #'
 #' @noRd
 NULL
