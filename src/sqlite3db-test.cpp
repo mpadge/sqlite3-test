@@ -117,7 +117,7 @@ int rcpp_import_stn_df (const char * bikedb, Rcpp::DataFrame stn_data,
         stationqry += "(\'" + city + "\',\'" + city + stn_id (i) + "\',\'" + 
             stn_name (i) + "\'," + stn_lon (i) + "," + stn_lat (i) + "),";
     }
-    i = 10;
+    unsigned i = 10;
     stationqry += "(\'" + city + "\',\'" + city + stn_id (i) + "\',\'" + 
         stn_name (i) + "\'," + stn_lon (i) + "," + stn_lat (i) + ");";
 
