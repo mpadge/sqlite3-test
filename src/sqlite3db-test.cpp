@@ -111,8 +111,10 @@ int rcpp_import_stn_df (const char * bikedb, Rcpp::DataFrame stn_data,
     }
     stationqry += ";";
     */
-    stationqry += "(\'ch\',\'ch001\',\'first stn\',50.0,0.0)," +
-        "(\'ch\',\'ch002\',\'second stn\',51.0,1.0);";
+    unsigned i = 0;
+    stationqry += "(\'" + city + "\',\'" + city + stn_id (i) + "\',\'" + 
+        stn_name (i) + "\'," + stn_lon (i) + "," + stn_lat (i) + ")";
+    stationqry += ",";
 
     rc = sqlite3_exec(dbcon, stationqry.c_str(), NULL, 0, &zErrMsg);
     if (rc != SQLITE_OK)
