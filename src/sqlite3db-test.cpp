@@ -101,6 +101,7 @@ int rcpp_import_stn_df (const char * bikedb, Rcpp::DataFrame stn_data,
     Rcpp::CharacterVector stn_lon = stn_data ["lon"];
     Rcpp::CharacterVector stn_lat = stn_data ["lat"];
 
+    /*
     for (unsigned i = 0; i<stn_data.nrow (); i++)
     {
         stationqry += "(\'" + city + "\',\'" + city + stn_id (i) + "\',\'" + 
@@ -109,6 +110,9 @@ int rcpp_import_stn_df (const char * bikedb, Rcpp::DataFrame stn_data,
             stationqry += ",";
     }
     stationqry += ";";
+    */
+    stationqry += "(\'ch\',\'ch001\',\'first stn\',50.0,0.0)," +
+        "(\'ch\',\'ch002\',\'second stn\',51.0,1.0);";
 
     rc = sqlite3_exec(dbcon, stationqry.c_str(), NULL, 0, &zErrMsg);
     if (rc != SQLITE_OK)
