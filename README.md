@@ -10,4 +10,6 @@ Current problems:
 
 1. Travis fails because of hash sum mismatch for 
 [specified `sqlite3` version](https://launchpad.net/~travis-ci/+archive/ubuntu/sqlite3)
-2. Appveyor fails because it can't find the `sqlite3.h` headers
+2. Appveyor fails because it can't find the `sqlite3.h` headers (the
+   [`win-builder.r-project` machines](https://win-builder.r-project.org/) in
+   contrast have no such issues).
