@@ -23,12 +23,13 @@ install:
 
 # Adapt as necessary starting from here
 
-      #environment:
-      #matrix:
-      #- R_VERSION: devel
-      #R_ARCH: x64
+      environment:
+          matrix:
+              - R_VERSION: release
+                R_ARCH: x64
 
 build_script:
+    #- travis-tool.sh r_binary_install curl
     - travis-tool.sh install_deps
 
 test_script:
@@ -56,3 +57,6 @@ artifacts:
 
     - path: '\*_*.zip'
       name: Bits
+
+cache:
+    - C:\RLibrary
