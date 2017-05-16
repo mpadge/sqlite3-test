@@ -26,7 +26,7 @@ install:
       environment:
           matrix:
               - R_VERSION: release
-                R_ARCH: x64
+              - R_ARCH: x64
 
 build_script:
     #- travis-tool.sh r_binary_install curl
