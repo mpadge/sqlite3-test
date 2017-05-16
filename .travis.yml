@@ -1,7 +1,7 @@
 language: R
 warnings_are_errors: true
 sudo: true
-cache: packages
+#cache: packages
 
 before_install:
     - sudo rm -rf /var/lib/apt/lists/*
