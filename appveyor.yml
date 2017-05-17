@@ -18,10 +18,11 @@ install:
     - ps: Start-FileDownload 'http://sqlite.org/2017/sqlite-amalgamation-3180000.zip'
       #- cmd: 7z e sqlite-amalgamation-3180000.zip -oC:\tools\sqlite -y > nul
     - cmd: 7z e sqlite-amalgamation-3180000.zip -y > nul
-      #- SET SQLITE3_LIB_DIR=%APPVEYOR_BUILD_FOLDER% 
-      #- SET SQLITE3_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER% 
+    - refreshenv
     - ps: cp C:\tools\sqlite\sqlite3.h C:\projects\sqlite3-test\src\sqlite3.h
     - ps: cp C:\tools\sqlite\sqlite3.c C:\projects\sqlite3-test\src\sqlite3.c
+      #- SET SQLITE3_LIB_DIR=%APPVEYOR_BUILD_FOLDER% 
+      #- SET SQLITE3_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER% 
 
 # Adapt as necessary starting from here
 
