@@ -18,3 +18,7 @@ addons:
             - sqlite3
             - libsqlite3-dev
             - libsqlite3-0
+
+after_success:
+    - source ("https://install-github.me/MangoTheCat/goodpractice")
+    - Rscript -e 'library(goodpractice);gp(checks=all_checks()[grepl("(rcmdcheck|covr)",all_checks())])'
