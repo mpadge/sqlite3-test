@@ -1,2 +1,10 @@
+^README\.Rmd$
+^README-.*\.png$
 ^\.travis\.yml$
+^appveyor.yml$
 ^README\.md$
+^makefile$
+^vignettes/makefile$
+^.*\.Rproj$
+^\.Rproj\.user$
+^aaa.Rmd$
