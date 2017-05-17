@@ -1,7 +1,3 @@
 CXX_STD = CXX11
-PKG_CPPFLAGS=-I. -I../inst/include
-ifeq "$(WIN)" "64"
-    PKG_LIBS = -L../inst/include/loader/x64 -lcurl -lsqlite
-else
-    PKG_LIBS = -L../inst/include/loader/i386 -lcurl -lsqlite
-endif
+PKG_CPPFLAGS = -I. -I../inst/include
+PKG_LIBS = -L. -L../inst/include/ -lcurl -lsqlite
