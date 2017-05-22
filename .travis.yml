@@ -4,21 +4,8 @@ dist: trusty
 sudo: true
 cache: packages
 
-before_install:
-      #- sudo apt-add-repository -y ppa:travis-ci/sqlite3
-      #- sudo apt-get -y update
-      #- sudo apt-get -y install sqlite3=3.7.15.1-1~travis1
-      #- sudo apt-get -y install sqlite3 libsqlite3-dev
-
-addons:
-    apt:
-        source:
-            - travis-ci/sqlite3
-        packages:
-            - sqlite3
-            - libsqlite3-dev
-            - libsqlite3-0
-
 after_success:
     - Rscript -e "source ('https://install-github.me/MangoTheCat/goodpractice')"
-    - Rscript -e 'library(goodpractice);gp(checks=all_checks()[grepl("(rcmdcheck|covr)",all_checks())])'
+      #- Rscript -e "source ('https://install-github.me/MangoTheCat/goodpractice')"
+      #- Rscript -e 'library(goodpractice);gp(checks=all_checks()[grepl("(rcmdcheck|covr)",all_checks())])'
+      #- Rscript -e 'library(goodpractice);gp(checks=all_checks())'
