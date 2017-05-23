@@ -16,7 +16,6 @@
 #include <unordered_set>
 
 #include "sqlite3db-utils.h"
-#include "sqlite3.h"
 
 int import_to_station_table (sqlite3 * dbcon,
     std::map <std::string, std::string> stationqry);

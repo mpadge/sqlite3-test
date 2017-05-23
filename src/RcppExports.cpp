@@ -83,3 +83,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"sqlite3test_rcpp_import_stn_df", (DL_FUNC) &sqlite3test_rcpp_import_stn_df, 3},
+    {"sqlite3test_rcpp_import_to_trip_table", (DL_FUNC) &sqlite3test_rcpp_import_to_trip_table, 4},
+    {"sqlite3test_rcpp_import_to_file_table", (DL_FUNC) &sqlite3test_rcpp_import_to_file_table, 4},
+    {"sqlite3test_rcpp_create_sqlite3_db", (DL_FUNC) &sqlite3test_rcpp_create_sqlite3_db, 1},
+    {"sqlite3test_rcpp_create_db_indexes", (DL_FUNC) &sqlite3test_rcpp_create_db_indexes, 4},
+    {"sqlite3test_rcpp_create_city_index", (DL_FUNC) &sqlite3test_rcpp_create_city_index, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_sqlite3test(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
